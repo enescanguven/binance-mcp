@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "binance": {
+      "command": "/path/to/your/venv/bin/python",
+      "args": ["-m", "binance_mcp"],
+      "cwd": "/path/to/binance-mcp"
+    }
+  }
+}
