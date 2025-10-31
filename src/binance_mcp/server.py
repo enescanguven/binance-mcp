@@ -1,9 +1,9 @@
 """MCP Server for Binance API."""
 
 import os
-import json
 from typing import Any
 from dotenv import load_dotenv
+import toon
 
 from mcp.server import Server
 from mcp.types import Tool, TextContent
@@ -44,18 +44,14 @@ def get_binance_client() -> Client:
                 "Get your API keys from: https://www.binance.com/en/my/settings/api-management"
             )
 
-        binance_client = Client(
-            api_key=api_key,
-            api_secret=api_secret,
-            testnet=testnet
-        )
+        binance_client = Client(api_key=api_key, api_secret=api_secret, testnet=testnet)
 
     return binance_client
 
 
 def format_response(data: Any) -> str:
-    """Format API response data as JSON string."""
-    return json.dumps(data, indent=2, default=str)
+    """Format API response data as TOON string for reduced token usage."""
+    return toon.encode(data)
 
 
 def handle_binance_error(error: Exception) -> str:
@@ -103,10 +99,7 @@ async def call_tool(name: str, arguments: Any) -> list[TextContent]:
             return [TextContent(type="text", text=format_response(result))]
 
         # Unknown tool
-        return [TextContent(
-            type="text",
-            text=f"Unknown tool: {name}"
-        )]
+        return [TextContent(type="text", text=f"Unknown tool: {name}")]
 
     except Exception as e:
         error_msg = handle_binance_error(e)
@@ -118,13 +111,10 @@ async def main():
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
-        await app.run(
-            read_stream,
-            write_stream,
-            app.create_initialization_options()
-        )
+        await app.run(read_stream, write_stream, app.create_initialization_options())
 
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())
