@@ -28,10 +28,15 @@ def test_format_response_list():
 
 def test_handle_binance_api_exception():
     """Test handling Binance API exceptions."""
-    error = BinanceAPIException(Mock(), 400, "Invalid symbol")
+    # Create a mock response with proper attributes
+    mock_response = Mock()
+    mock_response.status_code = 400
+    mock_response.text = '{"code": -1121, "msg": "Invalid symbol"}'
+
+    error = BinanceAPIException(mock_response, 400, '{"code": -1121, "msg": "Invalid symbol"}')
     result = handle_binance_error(error)
     assert "Binance API Error" in result
-    assert "400" in result
+    assert "-1121" in result
 
 
 def test_handle_binance_request_exception():
@@ -64,7 +69,7 @@ def test_get_binance_client_missing_keys():
 @patch.dict('os.environ', {
     'BINANCE_API_KEY': 'test_key',
     'BINANCE_API_SECRET': 'test_secret'
-})
+}, clear=False)
 @patch('binance_mcp.server.Client')
 def test_get_binance_client_success(mock_client):
     """Test successful client creation."""
