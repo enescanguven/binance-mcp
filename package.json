@@ -1,6 +1,6 @@
 {
-  "name": "binance-mcp",
-  "version": "1.0.0",
+  "name": "binance-mcp-tools",
+  "version": "2.0.0",
   "description": "Binance MCP server for Claude - trade crypto, check balances, and monitor markets through natural language",
   "type": "module",
   "main": "dist/index.js",
