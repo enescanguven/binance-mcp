@@ -109,4 +109,34 @@ export function registerAccountTools(server: McpServer, client: BinanceClient) {
       }
     },
   );
+
+  server.tool(
+    "get_dust_assets",
+    "Get list of assets that can be converted to BNB (dust balances below 0.0012 BTC)",
+    {},
+    async () => {
+      try {
+        return success(await client.getDustAssets());
+      } catch (err) {
+        return error(err);
+      }
+    },
+  );
+
+  server.tool(
+    "convert_dust_to_bnb",
+    "Convert small balances (dust) to BNB. 2% fee applies. Can be used once every 6 hours.",
+    {
+      assets: z
+        .array(z.string())
+        .describe("List of asset symbols to convert (e.g. ['ETH', 'XRP', 'SOL'])"),
+    },
+    async ({ assets }) => {
+      try {
+        return success(await client.convertDustToBnb(assets));
+      } catch (err) {
+        return error(err);
+      }
+    },
+  );
 }

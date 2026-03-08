@@ -61,10 +61,29 @@ export class BinanceClient {
     return data;
   }
 
+  private buildSearchParams(
+    params?: Record<string, string | number | string[] | undefined>,
+  ): URLSearchParams {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      for (const [key, value] of Object.entries(params)) {
+        if (value === undefined) continue;
+        if (Array.isArray(value)) {
+          for (const v of value) {
+            searchParams.append(key, v);
+          }
+        } else {
+          searchParams.append(key, String(value));
+        }
+      }
+    }
+    return searchParams;
+  }
+
   async signedRequest(
     method: string,
     endpoint: string,
-    params?: Record<string, string | number | undefined>,
+    params?: Record<string, string | number | string[] | undefined>,
   ): Promise<any> {
     if (!this.apiKey || !this.apiSecret) {
       throw new Error(
@@ -72,7 +91,7 @@ export class BinanceClient {
       );
     }
 
-    const queryParams = new URLSearchParams(this.cleanParams(params));
+    const queryParams = this.buildSearchParams(params);
     queryParams.set("timestamp", Date.now().toString());
     queryParams.set("recvWindow", "5000");
 
@@ -200,6 +219,18 @@ export class BinanceClient {
       asset,
       startTime,
       endTime,
+    });
+  }
+
+  // ── Dust ──
+
+  async getDustAssets() {
+    return this.signedRequest("POST", "/sapi/v1/asset/dust-btc");
+  }
+
+  async convertDustToBnb(assets: string[]) {
+    return this.signedRequest("POST", "/sapi/v1/asset/dust", {
+      asset: assets,
     });
   }
 
